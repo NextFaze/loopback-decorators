@@ -2,8 +2,8 @@ import 'reflect-metadata';
 
 import {makeDecorator} from './decorators';
 
-export function SfModelModule(options: any) {
-  return function SfModelModule(ctor: Function) {
+export function RemoteMethodModule(options: any) {
+  return function RemoteMethodModule(ctor: Function) {
     // save a reference to the original constructor
     const original = ctor;
 
@@ -70,7 +70,7 @@ export function createRemoteMethod(
                                     RemoteMethod.name
                                   } provider at position: ${isNull} is null`);
         }
-        return new RemoteMethod(...proms).sfOnRemote(...args);
+        return new RemoteMethod(...proms).onRemote(...args);
       } catch (err) {
         throw 'error instantiating method';
       }
@@ -87,7 +87,7 @@ export function createRemoteMethod(
                                     RemoteMethod.name
                                   } provider at position: ${isNull} is null`);
         }
-        return new RemoteMethod(...proms).sfOnRemote(...args);
+        return new RemoteMethod(...proms).onRemote(...args);
       } catch (err) {
         throw err;
       }
