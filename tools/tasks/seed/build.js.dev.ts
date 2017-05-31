@@ -51,8 +51,7 @@ export = class BuildJsDev extends TypeScriptTask {
     } else {
       typedBuildCounter++;
     }
-    console.log(Config.APP_DEST);
-    return result.js
+    return merge([result.js, result.dts])
         .pipe(plugins.sourcemaps.write())
         // Use for debugging with Webstorm/IntelliJ
         // https://github.com/mgechev/angular-seed/issues/1220
