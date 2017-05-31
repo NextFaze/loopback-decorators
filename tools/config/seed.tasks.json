@@ -1,0 +1,7 @@
+{
+  "build.dev": [
+    "clean.once",
+    "build.assets.dev",
+    "build.js.dev"
+  ]
+}

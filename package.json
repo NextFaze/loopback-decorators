@@ -1,0 +1,35 @@
+{
+  "name": "loopback-decorators",
+  "version": "1.0.0",
+  "description": "Remote method decorators for loopback",
+  "main": "dist/dev/index.js",
+  "scripts": {
+    "build.dev": "gulp build.dev --color --config-env dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "nextfaze",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/gulp": "^3.8.32",
+    "@types/gulp-load-plugins": "^0.0.28",
+    "@types/gulp-util": "^3.0.30",
+    "@types/merge-stream": "^1.0.28",
+    "@types/node": "^6.0.58",
+    "@types/rimraf": "0.0.28",
+    "@types/run-sequence": "0.0.28",
+    "@types/yargs": "^6.5.0",
+    "gulp": "3.9.1",
+    "gulp-load-plugins": "1.4.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-sourcemaps": "^1.9.1",
+    "gulp-typescript": "^3.1.7",
+    "gulp-util": "^3.0.8",
+    "isstream": "^0.1.2",
+    "merge-stream": "^1.0.1",
+    "rimraf": "^2.5.4",
+    "run-sequence": "^1.2.2",
+    "ts-node": "^2.0.0",
+    "typescript": "^2.1.5",
+    "yargs": "^6.6.0"
+  }
+}
