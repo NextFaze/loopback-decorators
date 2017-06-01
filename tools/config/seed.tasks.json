@@ -3,5 +3,10 @@
     "clean.once",
     "build.assets.dev",
     "build.js.dev"
+  ],
+  "build.prod": [
+    "clean.once",
+    "build.assets.prod",
+    "build.js.prod"
   ]
 }

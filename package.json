@@ -2,10 +2,11 @@
   "name": "loopback-decorators",
   "version": "0.0.1",
   "description": "Remote method decorators for loopback",
-  "main": "dist/dev/index.js",
-  "typings": "dist/dev/index.d.ts",
+  "main": "dist/prod/index.js",
+  "typings": "dist/prod/index.d.ts",
   "scripts": {
     "build.dev": "gulp build.dev --color --config-env dev",
+    "build.prod": "gulp build.prod --color --config-env prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "nextfaze",
