@@ -1,13 +1,20 @@
 pipeline {
     agent { label 'ubuntu' }
+    tools {nodejs '7.2.0'}
     stages {
-        stage('Build') {
-            agent { docker 'node:6.9.1' } 
+        stage('Install') {
             steps {
-                echo 'Hello, Node'
-                sh 'npm install'
-                sh 'npm run build.dev'
-                echo 'Installed'
+                sh 'npm i'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'npm run build.prod'
+            }
+        }
+        stage('Publish') {
+            steps {
+                // sh 'npm publish'
             }
         }
     }
