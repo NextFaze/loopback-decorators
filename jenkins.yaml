@@ -1,0 +1,2 @@
+auto_deploy_configurations:
+  master: true
