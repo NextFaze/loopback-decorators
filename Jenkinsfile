@@ -1,11 +1,44 @@
 pipeline {
-    agent { label 'ubuntu' }
-    tools {nodejs '7.2.0'}
+    agent {docker 'node:latest'}
+    environment {
+        NPM_TOKEN = credentials('NPM_TOKEN')
+    }
     stages {
-        stage('Example Build') {
+        stage ('Provide Config Files') {
             steps {
-                echo 'Hello, Maven'
-                sh 'npm --version'
+                script {
+                    try {
+                        configFileProvider([configFile(fileId: 'GLOBAL_NPMRC', targetLocation: '.npmrc')]) {}
+                    } catch (err) {
+                        echo "${err}"
+                    }
+                }
+            }
+        }
+        stage('Install Packages') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Build Project') {
+            steps {
+                sh 'npm run build.prod'
+            }
+        }
+        stage('Publish - Master') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh "npm publish --verbose"
+            }
+        }
+        stage('Publish - Develop') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                echo "This is develop"
             }
         }
     }
