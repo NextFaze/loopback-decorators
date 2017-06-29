@@ -130,6 +130,21 @@ export function $resolve(dep: any) {
         }
       });
     }
-    default: { return getAsync.call(this, dep); }
   }
+  if (dep[0] === '^') {
+    return new Promise((resolve, reject) => {
+      if (typeof this === 'object') {
+        this.constructor.getApp((err: any, app: any) => {
+          if (err) return reject(err);
+          return resolve(app.models[dep.slice(1)]);
+        });
+      } else if (typeof this === 'function') {
+        this.getApp((err: any, app: any) => {
+          if (err) return reject(err);
+          return resolve(app.models[dep.slice(1)]);
+        });
+      }
+    });
+  }
+  return getAsync.call(this, dep);
 }

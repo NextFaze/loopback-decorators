@@ -1,6 +1,6 @@
 {
   "name": "loopback-decorators",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Remote method decorators for loopback",
   "main": "dist/prod/index.js",
   "typings": "dist/prod/index.d.ts",
@@ -11,6 +11,9 @@
   },
   "author": "nextfaze",
   "license": "MIT",
+  "peerDependencies": {
+    "reflect-metadata": "0.10.1"
+  },
   "devDependencies": {
     "@types/gulp": "^3.8.32",
     "@types/gulp-load-plugins": "^0.0.28",
