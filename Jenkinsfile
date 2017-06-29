@@ -1,5 +1,10 @@
 pipeline {
-    agent {docker 'node:latest'}
+    agent {
+      label 'ubuntu'
+    }
+    tools {
+      nodejs '6.9.5'
+    }
     environment {
         NPM_TOKEN = credentials('NPM_TOKEN')
     }
