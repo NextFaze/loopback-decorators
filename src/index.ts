@@ -5,7 +5,7 @@ import {makeDecorator} from './decorators';
 export function RemoteMethodModule(options: any) {
   return function RemoteMethodModule(ctor: Function) {
     // save a reference to the original constructor
-    const original = ctor;
+    const Original: any = ctor;
 
     // the new constructor behaviour
     let f: any = function(...args: any[]) {
@@ -14,9 +14,9 @@ export function RemoteMethodModule(options: any) {
         let meta = Reflect.getMetadata('annotations', RemoteMethod);
         meta.forEach(createRemoteMethod.bind({}, Model, RemoteMethod));
       });
-      return original.apply(this, args);
+      return new Original(...args);
     };
-    f.prototype = original.prototype;
+    f.prototype = Original.prototype;
     return f;
   };
 };
