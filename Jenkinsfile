@@ -10,19 +10,15 @@ pipeline {
     }
     stages {
         stage ('Provide Config Files') {
-            steps {
-                script {
-                    try {
-                        configFileProvider([configFile(fileId: 'GLOBAL_NPMRC', targetLocation: '.npmrc')]) {}
-                    } catch (err) {
-                        echo "${err}"
-                    }
-                }
+          steps {
             }
+          }
         }
         stage('Install Packages') {
-            steps {
+          steps {
+              configFileProvider([configFile(fileId: 'GLOBAL_NPMRC', targetLocation: '.npmrc')]) {
                 sh 'npm install'
+              }
             }
         }
         stage('Build Project') {
@@ -35,7 +31,9 @@ pipeline {
                 branch 'master'
             }
             steps {
+              configFileProvider([configFile(fileId: 'GLOBAL_NPMRC', targetLocation: '.npmrc')]) {
                 sh "npm publish --verbose"
+              }
             }
         }
         stage('Publish - Develop') {
