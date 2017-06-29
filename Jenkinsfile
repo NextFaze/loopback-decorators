@@ -9,11 +9,6 @@ pipeline {
         NPM_TOKEN = credentials('NPM_TOKEN')
     }
     stages {
-        stage ('Provide Config Files') {
-          steps {
-            }
-          }
-        }
         stage('Install Packages') {
           steps {
               configFileProvider([configFile(fileId: 'GLOBAL_NPMRC', targetLocation: '.npmrc')]) {
