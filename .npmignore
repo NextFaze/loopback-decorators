@@ -26,3 +26,8 @@ tsconfig.json
 gulpfile.tsconfig
 .gitignore
 .editorconfig
+
+.npm/
+Jenkinsfile
+jenkins.yaml
+tools/
