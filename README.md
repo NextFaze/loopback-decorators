@@ -79,6 +79,30 @@ export class DoSomethingOnCreate {
 }
 
 ```
+
+# Setting up your remote module
+
+```ts
+import {RemoteMethodModule} from 'loopback-decorators';
+
+@RemoteMethodModule({
+  remotes: [GetStuffRemote],
+  events: [DoSomethingOnCreate],
+  proxyFor: 'ModelInternal',
+  proxyMethods: ['find', 'findById']
+})
+export class ModelAPI {
+  constructor(public Model: any) {
+  }
+}
+
+export = function(Model: any) {
+  return new ModelAPI(Model);
+};
+
+```
+
+
 # License
 
 MIT
