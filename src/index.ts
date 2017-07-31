@@ -18,7 +18,7 @@ export function RemoteMethodModule(options: any) {
       });
       (options.events || []).forEach((ModelEvent: any) => {
         let meta = Reflect.getMetadata('annotations', ModelEvent);
-        meta.forEach(createRemoteMethod.bind({}, Model, ModelEvent));
+        meta.forEach(createEventMethod.bind({}, Model, ModelEvent));
       });
       return new Original(...args);
     };
