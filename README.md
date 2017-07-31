@@ -56,14 +56,14 @@ export class GetStuffRemote {
 
 ```
 
-# Example Remote Method
+# Example ModelEvent
 
 A basic controller:
 
 ```ts
-import {EventMethod} from 'loopback-decorators';
+import {ModelEvent} from 'loopback-decorators';
 
-@EventMethod({
+@ModelEvent({
   <!-- the loopback event -->
   selector: 'create',
   providers: [
