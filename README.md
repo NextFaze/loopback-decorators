@@ -14,7 +14,7 @@ Within your node project, install the package from npm using:
 npm install loopback-decorators
 ```
 
-# Example
+# Example Remote Method
 
 A basic controller:
 
@@ -56,6 +56,29 @@ export class GetStuffRemote {
 
 ```
 
+# Example Remote Method
+
+A basic controller:
+
+```ts
+import {EventMethod} from 'loopback-decorators';
+
+@EventMethod({
+  <!-- the loopback event -->
+  selector: 'create',
+  providers: [
+    '$app', '$model', '^User'
+    }
+  ],
+})
+export class DoSomethingOnCreate {
+  constructor(public app, public Model, public User) {}
+  async onEvent(inst) {
+    // This is where you put the event method logic
+  }
+}
+
+```
 # License
 
 MIT

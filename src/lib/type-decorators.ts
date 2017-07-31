@@ -8,12 +8,13 @@
  */
 
 /**
- * @whatItDoes Represents a type that a Component or other object is instances of.
+ * @whatItDoes Represents a type that a Component or other object is instances
+ * of.
  *
  * @description
  *
- * An example of a `Type` is `MyCustomComponent` class, which in JavaScript is be represented by
- * the `MyCustomComponent` constructor function.
+ * An example of a `Type` is `MyCustomComponent` class, which in JavaScript is
+ * be represented by the `MyCustomComponent` constructor function.
  *
  * @stable
  */
@@ -36,13 +37,13 @@ export interface Type<T> extends Function { new(...args: any[]): T; }
 // TODO(jteplitz602): Load WorkerGlobalScope from lib.webworker.d.ts file #3492
 declare var WorkerGlobalScope: any /** TODO #9100 */;
 // CommonJS / Node have global context exposed as "global" variable.
-// We don't want to include the whole node.d.ts this this compilation unit so we'll just fake
-// the global "global" var for now.
+// We don't want to include the whole node.d.ts this this compilation unit so
+// we'll just fake the global "global" var for now.
 declare var global: any /** TODO #9100 */;
 const __window = typeof window !== 'undefined' && window;
-const __self   = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' &&
+const __self = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' &&
     self instanceof WorkerGlobalScope && self;
-const __global                       = typeof global !== 'undefined' && global;
+const __global = typeof global !== 'undefined' && global;
 const _global: {[name: string]: any} = __window || __global || __self;
 export {_global as global};
 
@@ -101,7 +102,7 @@ export function stringify(token: any): string {
 }
 
 let _nextClassId = 0;
-const Reflect    = global['Reflect'];
+const Reflect = global['Reflect'];
 
 /**
  * Declares the interface to be used with {@link Class}.
@@ -117,26 +118,25 @@ export type ClassDefinition = {
   /**
    * Required constructor function for a class.
    *
-   * The function may be optionally wrapped in an `Array`, in which case additional parameter
-   * annotations may be specified.
-   * The number of arguments and the number of parameter annotations must match.
+   * The function may be optionally wrapped in an `Array`, in which case
+   * additional parameter annotations may be specified. The number of arguments
+   * and the number of parameter annotations must match.
    *
    * See {@link Class} for example of usage.
    */
   constructor: Function | any[];
-} &
-{
+}&{
   /**
-   * Other methods on the class. Note that values should have type 'Function' but TS requires
-   * all properties to have a narrower type than the index signature.
+   * Other methods on the class. Note that values should have type 'Function'
+   * but TS requires all properties to have a narrower type than the index
+   * signature.
    */
   [x: string]: Type<any>|Function|any[];
 };
 
 /**
- * An interface implemented by all Angular type decorators, which allows them to be used as ES7
- * decorators as well as
- * Angular DSL syntax.
+ * An interface implemented by all Angular type decorators, which allows them to
+ * be used as ES7 decorators as well as Angular DSL syntax.
  *
  * DSL syntax:
  *
@@ -174,7 +174,8 @@ export interface TypeDecorator {
   annotations: any[];
 
   /**
-   * Generate a class from the definition and annotate it with {@link TypeDecorator#annotations}.
+   * Generate a class from the definition and annotate it with {@link
+   * TypeDecorator#annotations}.
    */
   Class(obj: ClassDefinition): Type<any>;
 }
@@ -199,8 +200,8 @@ function applyParams(fnOrArray: Function|any[]|undefined, key: string): Function
 
   if (Array.isArray(fnOrArray)) {
     const annotations: any[] = fnOrArray as any[];
-    const annoLength         = annotations.length - 1;
-    const fn: Function       = fnOrArray[annoLength];
+    const annoLength = annotations.length - 1;
+    const fn: Function = fnOrArray[annoLength];
     if (typeof fn !== 'function') {
       throw new Error(
           `Last position of Class method array must be Function in key ${key} was '${
@@ -291,7 +292,8 @@ function applyParams(fnOrArray: Function|any[]|undefined, key: string): Function
  *
  * ```
  * var MyService = ng.Class({
- *   constructor: [String, [new Optional(), Service], function(name, myService) {
+ *   constructor: [String, [new Optional(), Service], function(name, myService)
+ * {
  *     ...
  *   }]
  * });
@@ -394,7 +396,7 @@ export function makeDecorator(
       return cls;
     };
     TypeDecorator.annotations = chainAnnotation;
-    TypeDecorator.Class       = Class;
+    TypeDecorator.Class = Class;
     if (chainFn) chainFn(TypeDecorator);
     return TypeDecorator;
   }
@@ -404,7 +406,7 @@ export function makeDecorator(
   }
 
   DecoratorFactory.prototype.toString = () => `@${name}`;
-  (<any>DecoratorFactory).annotationCls    = DecoratorFactory;
+  (<any>DecoratorFactory).annotationCls = DecoratorFactory;
   return DecoratorFactory;
 }
 
@@ -442,8 +444,8 @@ export function makeParamDecorator(
     function ParamDecorator(cls: any, unusedKey: any, index: number): any {
       const parameters: (any[]|null)[] = Reflect.getOwnMetadata('parameters', cls) || [];
 
-      // there might be gaps if some in between parameters do not have annotations.
-      // we pad with nulls.
+      // there might be gaps if some in between parameters do not have
+      // annotations. we pad with nulls.
       while (parameters.length <= index) {
         parameters.push(null);
       }
@@ -459,7 +461,7 @@ export function makeParamDecorator(
     ParamDecoratorFactory.prototype = Object.create(parentClass.prototype);
   }
   ParamDecoratorFactory.prototype.toString = () => `@${name}`;
-  (<any>ParamDecoratorFactory).annotationCls    = ParamDecoratorFactory;
+  (<any>ParamDecoratorFactory).annotationCls = ParamDecoratorFactory;
   return ParamDecoratorFactory;
 }
 
@@ -488,6 +490,6 @@ export function makePropDecorator(
   }
 
   PropDecoratorFactory.prototype.toString = () => `@${name}`;
-  (<any>PropDecoratorFactory).annotationCls    = PropDecoratorFactory;
+  (<any>PropDecoratorFactory).annotationCls = PropDecoratorFactory;
   return PropDecoratorFactory;
 }
