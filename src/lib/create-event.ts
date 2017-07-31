@@ -1,7 +1,7 @@
 import {resolve} from './utils';
 export function createEventMethod(RemoteClass: any, RemoteMethod: any, props: any) {
   let {selector, providers} = props;
-  RemoteClass.on(selector, async function(args: any) {
+  RemoteClass.on(selector, async function(...args: any[]) {
     let proms = await resolve(RemoteClass, providers);
     let isNull = proms.indexOf(null);
     if (isNull > -1) {
