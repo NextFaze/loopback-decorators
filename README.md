@@ -102,6 +102,32 @@ export = function(Model: any) {
 
 ```
 
+# Validating Remote Inputs
+
+```ts
+@RemoteMethod({
+  // ...
+  meta: {
+    accessType: 'WRITE',
+    isStatic: false,
+    description: 'Create a thing',
+    accepts: [{
+      arg: 'payload',
+      type: 'RequestModelType',
+      http: { source: 'body' }
+    }],
+    returns: {arg: 'res', type: 'stuff', root: true},
+    http: {path: '/things', verb: 'post'}
+  }
+})
+export class GetStuffRemote {
+  constructor(public app, public instance, public customEntity) {}
+  async onRemote(@Validate payload) {
+    // Error will be thrown before `onRemote` is called if the payload is not valid
+  }
+}
+```
+
 
 # License
 
