@@ -1,8 +1,5 @@
 import 'reflect-metadata';
 
-declare var global: any /** TODO #9100 */;
-const Reflect = global['Reflect'];
-
 export const validateMetadataKey = Symbol('validates');
 
 const ValidationError = require('loopback').ValidationError;
