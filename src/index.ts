@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import {createEventMethod} from './lib/create-event';
 import {createRemoteMethod} from './lib/create-remote';
 import {makeDecorator} from './lib/type-decorators';
+export {Validate} from './lib/validate';
 
 /**
  * Configuration fo rthe remote method model
