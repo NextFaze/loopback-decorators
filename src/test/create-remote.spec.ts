@@ -1,6 +1,7 @@
-import { createRemoteMethod } from '../lib/create-remote';
-import { expect } from 'chai';
-import { spy } from 'sinon';
+import {expect} from 'chai';
+import {spy} from 'sinon';
+
+import {createRemoteMethod} from '../lib/create-remote';
 
 describe('createRemoteMethod', () => {
   it('should handle a static method', () => {
@@ -36,16 +37,13 @@ describe('createRemoteMethod', () => {
       public onRemote = remoteSpy;
     }
     createRemoteMethod(mockClass, remote, props);
-    let res = await (<any>mockClass).prototype.meth.call({}, 'dank');
+    let res = await(<any>mockClass).prototype.meth.call({}, 'dank');
     expect(remoteSpy.calledWith('dank')).to.be.true;
     expect(res).to.eql('output');
   });
 });
 
-const mockClassFactory = () => ({
-  prototype: {},
-  remoteMethod: spy(() => true)
-});
+const mockClassFactory = () => ({prototype: {}, remoteMethod: spy(() => true)});
 
-const providers: any = [{ provide: 'DankDep', useFactory: () => 'Dankness provided' }];
-const mockProps = () => ({ selector: 'meth', meta: { isStatic: false }, providers });
+const providers: any = [{provide: 'DankDep', useFactory: () => 'Dankness provided'}];
+const mockProps = () => ({selector: 'meth', meta: {isStatic: false}, providers});
