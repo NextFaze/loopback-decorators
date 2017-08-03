@@ -3,7 +3,7 @@ import 'reflect-metadata';
 export function _normalizeRelations(providers: any[] = [], res: any = []) {
   providers.forEach(b => {
     if (typeof b === 'string') {
-      res.push({ provide: b, useToken: b });
+      res.push({provide: b, useToken: b});
     } else if (b && typeof b === 'object' && (b as any).provide !== undefined) {
       res.push(b);
     } else if (b instanceof Array) {
@@ -17,11 +17,11 @@ export function _normalizeRelations(providers: any[] = [], res: any = []) {
 export function resolve(instance: any, providers: any[]) {
   let normalized = _normalizeRelations(providers, []);
   let resolving = normalized.map((provider: any) => {
-    if (typeof provider.useToken === 'string') return $resolve.call(instance, provider.useToken);
+    if (typeof provider.useToken === 'string')
+      return $resolve.call(instance, provider.useToken);
     else if (typeof provider.useFactory === 'function')
-      return $resolve
-        .call(instance, provider.deps)
-        .then((resolved: any) => provider.useFactory.apply(instance, resolved));
+      return $resolve.call(instance, provider.deps)
+          .then((resolved: any) => provider.useFactory.apply(instance, resolved));
   });
   return Promise.all(resolving);
 }
