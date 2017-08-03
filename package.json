@@ -12,7 +12,8 @@
   "author": "nextfaze",
   "license": "MIT",
   "peerDependencies": {
-    "reflect-metadata": "^0.1.10"
+    "reflect-metadata": "^0.1.10",
+    "loopback": "^3.0.0"
   },
   "devDependencies": {
     "@types/gulp": "^3.8.32",
@@ -30,6 +31,7 @@
     "gulp-typescript": "^3.1.7",
     "gulp-util": "^3.0.8",
     "isstream": "^0.1.2",
+    "loopback": "^3.0.0",
     "merge-stream": "^1.0.1",
     "reflect-metadata": "^0.1.10",
     "rimraf": "^2.5.4",
