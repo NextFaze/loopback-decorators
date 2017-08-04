@@ -2,15 +2,15 @@ import * as gulp from 'gulp';
 import * as gulpLoadPlugins from 'gulp-load-plugins';
 import * as util from 'gulp-util';
 const merge = require('merge-stream');
-import {join /*, sep, relative*/} from 'path';
+import { join /*, sep, relative*/ } from 'path';
 
 import Config from '../../config';
-import {makeTsProject} from '../../utils';
-import {TypeScriptTask} from '../typescript_task';
+import { makeTsProject } from '../../utils';
+import { TypeScriptTask } from '../typescript_task';
 
 const plugins = <any>gulpLoadPlugins();
 
-let typedBuildCounter = Config.TYPED_COMPILE_INTERVAL;  // Always start with the typed build.
+let typedBuildCounter = Config.TYPED_COMPILE_INTERVAL; // Always start with the typed build.
 
 /**
  * Executes the build process, transpiling the TypeScript files (except the spec and e2e-spec files)
@@ -21,10 +21,7 @@ export = class BuildJsDev extends TypeScriptTask {
   run() {
     let tsProject: any;
     let typings = gulp.src([Config.TOOLS_DIR + '/manual_typings/**/*.d.ts']);
-    let src = [
-      join(Config.APP_SRC, '**/*.ts'), '!' + join(Config.APP_SRC, '**/*.spec.ts'),
-      '!' + join(Config.APP_SRC, '**/*.e2e-spec.ts')
-    ];
+    let src = [join(Config.APP_SRC, '**/*.ts'), '!' + join(Config.APP_SRC, '**/*.e2e-spec.ts')];
 
     let projectFiles = gulp.src(src);
     let result: any;
@@ -33,7 +30,7 @@ export = class BuildJsDev extends TypeScriptTask {
     // Only do a typed build every X builds, otherwise do a typeless build to speed things up
     if (typedBuildCounter < Config.TYPED_COMPILE_INTERVAL) {
       isFullCompile = false;
-      tsProject = makeTsProject({isolatedModules: true});
+      tsProject = makeTsProject({ isolatedModules: true });
       projectFiles = projectFiles.pipe(plugins.cached());
       util.log('Performing typeless TypeScript compile.');
     } else {
@@ -41,17 +38,21 @@ export = class BuildJsDev extends TypeScriptTask {
       projectFiles = merge(typings, projectFiles);
     }
 
-    result = projectFiles.pipe(plugins.plumber())
-                 .pipe(plugins.sourcemaps.init())
-                 .pipe(tsProject())
-                 .on('error', () => { typedBuildCounter = Config.TYPED_COMPILE_INTERVAL; });
+    result = projectFiles
+      .pipe(plugins.plumber())
+      .pipe(plugins.sourcemaps.init())
+      .pipe(tsProject())
+      .on('error', () => {
+        typedBuildCounter = Config.TYPED_COMPILE_INTERVAL;
+      });
 
     if (isFullCompile) {
       typedBuildCounter = 0;
     } else {
       typedBuildCounter++;
     }
-    return merge([result.js, result.dts])
+    return (
+      merge([result.js, result.dts])
         .pipe(plugins.sourcemaps.write())
         // Use for debugging with Webstorm/IntelliJ
         // https://github.com/mgechev/angular-seed/issues/1220
@@ -61,6 +62,7 @@ export = class BuildJsDev extends TypeScriptTask {
         //        relative(file.path, PROJECT_ROOT + '/' + APP_SRC).replace(sep, '/') + '/' +
         //        APP_SRC
         //    }))
-        .pipe(gulp.dest(Config.APP_DEST));
+        .pipe(gulp.dest(Config.APP_DEST))
+    );
   }
 };

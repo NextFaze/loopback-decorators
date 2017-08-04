@@ -4,15 +4,12 @@ export function _normalizeRelations(providers: any[] = [], res: any = []) {
   providers.forEach(b => {
     if (typeof b === 'string') {
       res.push({provide: b, useToken: b});
-
     } else if (b && typeof b === 'object' && (b as any).provide !== undefined) {
       res.push(b);
-
     } else if (b instanceof Array) {
       _normalizeRelations(b, res);
-
     } else {
-      throw 'invalid provider error';
+      throw new Error('Invalid provider error');
     }
   });
   return res;
@@ -32,8 +29,8 @@ export function getAsync(relation: string) {
   return this[relation].getAsync();
 }
 
-export function $resolve(dep: any) {
-  if (Array.isArray(dep)) return Promise.all(dep.map((d) => $resolve.call(this, d)));
+export function $resolve(dep: any = []) {
+  if (Array.isArray(dep)) return Promise.all(dep.map(d => $resolve.call(this, d)));
   switch (dep) {
     case '$model': {
       if (typeof this === 'object') {
@@ -41,14 +38,14 @@ export function $resolve(dep: any) {
       } else if (typeof this === 'function') {
         return this;
       } else {
-        throw 'model is not object or function';
+        throw new Error('Model is not object or function');
       }
     }
     case '$instance': {
       if (typeof this === 'object') {
         return this;
       } else {
-        throw 'instance not available in this ctx';
+        throw new Error('Instance not available in this ctx');
       }
     }
     case '$app': {

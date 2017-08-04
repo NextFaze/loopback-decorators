@@ -16,18 +16,9 @@
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,
     "noFallthroughCasesInSwitch": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules"
-    ],
-    "types": [
-      "node"
-    ]
+    "typeRoots": ["./node_modules/@types", "./node_modules"],
+    "types": ["node"]
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src"
-  ],
+  "exclude": ["node_modules", "dist", "src"],
   "compileOnSave": false
 }

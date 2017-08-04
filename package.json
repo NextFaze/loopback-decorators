@@ -7,7 +7,8 @@
   "scripts": {
     "build.dev": "gulp build.dev --color --config-env dev",
     "build.prod": "gulp build.prod --color --config-env prod",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "npm run build.dev",
+    "test": "mocha dist/dev/test/*.spec.js"
   },
   "author": "nextfaze",
   "license": "MIT",
@@ -16,14 +17,20 @@
     "loopback": "^3.0.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.0.2",
+    "@types/chai-as-promised": "0.0.31",
     "@types/gulp": "^3.8.32",
     "@types/gulp-load-plugins": "^0.0.28",
     "@types/gulp-util": "^3.0.30",
     "@types/merge-stream": "^1.0.28",
+    "@types/mocha": "^2.2.41",
     "@types/node": "^6.0.58",
     "@types/rimraf": "0.0.28",
     "@types/run-sequence": "0.0.28",
+    "@types/sinon": "^2.3.3",
     "@types/yargs": "^6.5.0",
+    "chai": "^4.1.0",
+    "chai-as-promised": "^7.1.1",
     "gulp": "3.9.1",
     "gulp-load-plugins": "1.4.0",
     "gulp-plumber": "^1.1.0",
@@ -33,9 +40,11 @@
     "isstream": "^0.1.2",
     "loopback": "^3.0.0",
     "merge-stream": "^1.0.1",
+    "mocha": "^3.5.0",
     "reflect-metadata": "^0.1.10",
     "rimraf": "^2.5.4",
     "run-sequence": "^1.2.2",
+    "sinon": "^2.4.1",
     "ts-node": "^2.0.0",
     "typescript": "2.1.5",
     "yargs": "^6.6.0"
