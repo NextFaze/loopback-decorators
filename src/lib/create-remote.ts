@@ -1,3 +1,4 @@
+import {buildResponse} from './response';
 import {resolve} from './utils';
 import {validateArgs} from './validate';
 
@@ -13,7 +14,8 @@ export function createRemoteMethod(RemoteClass: any, RemoteMethod: any, props: a
         throw Error(
             `cannot instantiate ${RemoteMethod.name} provider at position: ${isNull} is null`);
       }
-      return new RemoteMethod(...proms).onRemote(...args);
+      let result = await new RemoteMethod(...proms).onRemote(...args);
+      return buildResponse(result, RemoteMethod);
     };
   } else {
     RemoteClass.prototype[selector] = async function(...args: any[]) {
@@ -26,7 +28,8 @@ export function createRemoteMethod(RemoteClass: any, RemoteMethod: any, props: a
             `cannot instantiate ${RemoteMethod.name} provider at position: ${isNull} is null`);
       }
 
-      return new RemoteMethod(...proms).onRemote(...args);
+      let result = await new RemoteMethod(...proms).onRemote(...args);
+      return buildResponse(result, RemoteMethod);
     };
   }
   RemoteClass.remoteMethod(selector, meta);

@@ -128,6 +128,40 @@ export class GetStuffRemote {
 }
 ```
 
+# Returning an instance of another model as a response
+
+```ts
+export class GetStuffRemote {
+  constructor(public app, public instance, public customEntity) {}
+
+  @Response('ModelContructorName')
+  async onRemote(payload: any) {
+    // Result returned will be an instance of app.models.ModelContructorName
+  }
+}
+```
+
+or, if you are returning an array
+
+```ts
+export class GetStuffRemote {
+  constructor(public app, public instance, public customEntity) {}
+
+  @Response(['ModelContructorName'])
+  async onRemote(payload: any) {
+    // Result returned will be an array of app.models.ModelContructorName
+  }
+}
+```
+
+You can also pass the config directly:
+
+```ts
+  @Response({ responseClass: 'MyResponseClass' })
+  // Or, for an array
+  @Response({ responseClass: 'MyResponseClass', isMulti: true })
+```
+
 
 # License
 
