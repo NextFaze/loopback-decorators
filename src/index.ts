@@ -3,6 +3,8 @@ import 'reflect-metadata';
 import {createEventMethod} from './lib/create-event';
 import {createRemoteMethod} from './lib/create-remote';
 import {makeDecorator} from './lib/type-decorators';
+
+export {Response} from './lib/response';
 export {Validate} from './lib/validate';
 
 /**
