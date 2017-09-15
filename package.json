@@ -8,7 +8,7 @@
     "build.dev": "gulp build.dev --color --config-env dev",
     "build.prod": "gulp build.prod --color --config-env prod",
     "pretest": "npm run build.dev",
-    "test": "mocha dist/dev/test/*.spec.js"
+    "test": "mocha --require source-map-support/register dist/dev/test/*.spec.js"
   },
   "author": "nextfaze",
   "license": "MIT",
