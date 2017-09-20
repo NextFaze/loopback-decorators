@@ -52,13 +52,20 @@ export function RemoteMethodModule(options: IModuleOptions) {
     // the new constructor behaviour
     let f: any = function(...args: any[]) {
       let Model = args[0];
-
       if (options.proxyFor) {
         Model.getApp((err: Error, app: any) => {
           app.once('booted', () => {
             const ProxyFor = app.models[options.proxyFor];
             (options.proxyMethods || []).forEach(method => {
-              Model[method] = ProxyFor[method].bind(ProxyFor);
+              if (method.indexOf('prototype.') === 0) {
+                let methodName = method.split('.').pop();
+                Model.prototype[methodName] = function instance() {
+                  this.constructor = ProxyFor;
+                  ProxyFor.prototype[methodName].apply(this, arguments);
+                }
+              } else {
+                Model[method] = ProxyFor[method].bind(ProxyFor);
+              }
             });
           });
         });
