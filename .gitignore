@@ -19,3 +19,4 @@ dist/
 .strong-pm
 coverage
 npm-debug.log*
+package-lock.json

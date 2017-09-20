@@ -61,4 +61,37 @@ describe('buildResponse', () => {
     expect(response).to.be.an('array').and.to.have.lengthOf(2);
     response.forEach(res => expect(res).to.be.an.instanceof (loopback.User));
   });
+
+  context('Validation', () => {
+    let ProxyModel: any, entity: any, withRelated: any;
+    before(async () => {
+      const InternalModelA = loopback.Model.extend(
+          'InternalModelA', {existsKey: 'string', privateKey: 'string'},
+          {strict: true, relations: {mb: {type: 'hasOne', model: 'InternalModelB'}}});
+      const InternalModelB = loopback.Model.extend('InternalModelB', {relatedKey: 'string'});
+      ProxyModel = loopback.Model.extend(
+          'ProxyModel', {existsKey: 'string', mb: 'InternalModelB'}, {strict: true});
+      [InternalModelA, InternalModelB, ProxyModel].forEach(mdl => mdl.attachTo(loopback.memory()));
+      let internal = await InternalModelA.create({existsKey: 'ok', privateKey: 'secret'});
+      await internal.mb.create({relatedKey: 'I am related'});
+      entity = await InternalModelA.findOne();
+      withRelated = await InternalModelA.findOne({include: 'mb'});
+    });
+
+    it('allows strict to filter out non-existant properties', () => {
+      const response = mapResponse(ProxyModel, entity);
+      // Should not have private key property
+      expect(response.toJSON()).to.eql({id: 1, existsKey: 'ok', mb: undefined});
+    });
+
+    it('works for model relations', async () => {
+      const response = mapResponse(ProxyModel, withRelated);
+      // Should not have private key property
+      expect(response.toJSON()).to.eql({
+        id: 1,
+        existsKey: 'ok',
+        mb: {id: 1, internalModelAId: 1, relatedKey: 'I am related'}
+      });
+    });
+  });
 });
