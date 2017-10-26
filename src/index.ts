@@ -42,6 +42,14 @@ export interface IModuleOptions {
    * @memberof IModuleOptions
    */
   proxyMethods?: string[];
+  /**
+   * Whether or not this is a strict proxy - i.e returns an instance of this model instead of the
+   * proxied one.
+   *
+   * @type {boolean}
+   * @memberof IModuleOptions
+   */
+  strict?: boolean;
 }
 
 export function RemoteMethodModule(options: IModuleOptions) {
@@ -59,12 +67,24 @@ export function RemoteMethodModule(options: IModuleOptions) {
             (options.proxyMethods || []).forEach(method => {
               if (method.indexOf('prototype.') === 0) {
                 let methodName = method.split('.').pop();
-                Model.prototype[methodName] = function instance() {
-                  this.constructor = ProxyFor;
-                  ProxyFor.prototype[methodName].apply(this, arguments);
+                Model.prototype[methodName] = async function instance(...args: any[]) {
+                  let instance = this;
+                  if (this.toJSON) {
+                    let data = {...this.toJSON()};
+                    if (this.isNewRecord()) {
+                      data.id = undefined;
+                    }
+                    instance = new ProxyFor(data);
+                    instance.__persisted = this.__persisted;
+                  }
+                  return await getResult(
+                      ProxyFor.prototype[methodName].bind(instance), Model, options.strict, args);
                 }
               } else {
-                Model[method] = ProxyFor[method].bind(ProxyFor);
+                Model[method] = async function(...args: any[]) {
+                  return await getResult(
+                      ProxyFor[method].bind(ProxyFor), Model, options.strict, args);
+                }
               }
             });
           });
@@ -86,7 +106,54 @@ export function RemoteMethodModule(options: IModuleOptions) {
   };
 }
 
-export const RemoteMethod: any = <any>makeDecorator(
-    'RemoteMethod', {selector: undefined, meta: undefined, providers: undefined});
+async function getResult(callMethod: Function, ProxyModel: any, strict: boolean, args: any[]) {
+  let cb = getCallback(args);
+  if (cb) {
+    args = args.slice(0, -1);
+  }
+  try {
+    let result = await callMethod(...args);
+    if (strict) {
+      result = mapResponse(ProxyModel, result);
+    }
+    if (cb) {
+      cb(null, result);
+    }
+    return result;
+  } catch (ex) {
+    if (cb) {
+      return cb(ex);
+    }
+    throw ex;
+  }
+}
+
+function getCallback(...args: any[]) {
+  if (typeof args[args.length - 1] === 'function') {
+    return args[args.length - 1];
+  }
+  return false;
+}
+
+function mapResponse(ProxyModel: any, response: any) {
+  if (Array.isArray(response)) {
+    return response.map((res: any) => toProxy(ProxyModel, res));
+  } else {
+    return toProxy(ProxyModel, response);
+  }
+}
+
+function toProxy(ProxyModel: any, res: any) {
+  if (res && res.toJSON) {
+    let result = new ProxyModel(res.toJSON());
+    result.__persisted = res.__persisted;
+    return result;
+  } else {
+    return res;
+  }
+}
+
+export const RemoteMethod: any =
+    makeDecorator('RemoteMethod', {selector: undefined, meta: undefined, providers: undefined});
 export const ModelEvent: any =
-    <any>makeDecorator('ModelEvent', {selector: undefined, providers: undefined});
+    makeDecorator('ModelEvent', {selector: undefined, providers: undefined});
