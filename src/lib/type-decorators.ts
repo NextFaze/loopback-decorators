@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24,7 +23,9 @@ export function isType(v: any): v is Type<any> {
   return typeof v === 'function';
 }
 
-export interface Type<T> extends Function { new(...args: any[]): T; }
+export interface Type<T> extends Function {
+  new (...args: any[]): T;
+}
 
 /**
  * @license
@@ -41,15 +42,18 @@ declare var WorkerGlobalScope: any /** TODO #9100 */;
 // we'll just fake the global "global" var for now.
 declare var global: any /** TODO #9100 */;
 const __window = typeof window !== 'undefined' && window;
-const __self = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' &&
-    self instanceof WorkerGlobalScope && self;
+const __self =
+  typeof self !== 'undefined' &&
+  typeof WorkerGlobalScope !== 'undefined' &&
+  self instanceof WorkerGlobalScope &&
+  self;
 const __global = typeof global !== 'undefined' && global;
-const _global: {[name: string]: any} = __window || __global || __self;
-export {_global as global};
+const _global: { [name: string]: any } = __window || __global || __self;
+export { _global as global };
 
 // When Symbol.iterator doesn't exist, retrieves the key used in es6-shim
 let _symbolIterator: any = null;
-export function getSymbolIterator(): string|symbol {
+export function getSymbolIterator(): string | symbol {
   if (!_symbolIterator) {
     const Symbol = _global['Symbol'];
     if (Symbol && Symbol.iterator) {
@@ -59,8 +63,11 @@ export function getSymbolIterator(): string|symbol {
       const keys = Object.getOwnPropertyNames(Map.prototype);
       for (let i = 0; i < keys.length; ++i) {
         const key = keys[i];
-        if (key !== 'entries' && key !== 'size' &&
-            (Map as any).prototype[key] === Map.prototype['entries']) {
+        if (
+          key !== 'entries' &&
+          key !== 'size' &&
+          (Map as any).prototype[key] === Map.prototype['entries']
+        ) {
           _symbolIterator = key;
         }
       }
@@ -71,7 +78,10 @@ export function getSymbolIterator(): string|symbol {
 
 // JS has NaN !== NaN
 export function looseIdentical(a: any, b: any): boolean {
-  return a === b || typeof a === 'number' && typeof b === 'number' && isNaN(a) && isNaN(b);
+  return (
+    a === b ||
+    (typeof a === 'number' && typeof b === 'number' && isNaN(a) && isNaN(b))
+  );
 }
 
 export function stringify(token: any): string {
@@ -125,14 +135,13 @@ export type ClassDefinition = {
    * See {@link Class} for example of usage.
    */
   constructor: Function | any[];
-} &
-{
+} & {
   /**
    * Other methods on the class. Note that values should have type 'Function'
    * but TS requires all properties to have a narrower type than the index
    * signature.
    */
-  [x: string]: Type<any>|Function|any[];
+  [x: string]: Type<any> | Function | any[];
 };
 
 /**
@@ -165,7 +174,11 @@ export interface TypeDecorator {
   // ParameterDecorator is declared in lib.d.ts as a `declare type`
   // so we cannot declare this interface as a subtype.
   // see https://github.com/angular/angular/issues/3379#issuecomment-126169417
-  (target: Object, propertyKey?: string|symbol, parameterIndex?: number): void;
+  (
+    target: Object,
+    propertyKey?: string | symbol,
+    parameterIndex?: number
+  ): void;
 
   /**
    * Storage for the accumulated annotations so far used by the DSL syntax.
@@ -182,17 +195,30 @@ export interface TypeDecorator {
 }
 
 function extractAnnotation(annotation: any): any {
-  if (typeof annotation === 'function' && annotation.hasOwnProperty('annotation')) {
+  if (
+    typeof annotation === 'function' &&
+    annotation.hasOwnProperty('annotation')
+  ) {
     // it is a decorator, extract annotation
     annotation = annotation.annotation;
   }
   return annotation;
 }
 
-function applyParams(fnOrArray: Function|any[]|undefined, key: string): Function {
-  if (fnOrArray === Object || fnOrArray === String || fnOrArray === Function ||
-      fnOrArray === Number || fnOrArray === Array) {
-    throw new Error(`Can not use native ${stringify(fnOrArray)} as constructor`);
+function applyParams(
+  fnOrArray: Function | any[] | undefined,
+  key: string
+): Function {
+  if (
+    fnOrArray === Object ||
+    fnOrArray === String ||
+    fnOrArray === Function ||
+    fnOrArray === Number ||
+    fnOrArray === Array
+  ) {
+    throw new Error(
+      `Can not use native ${stringify(fnOrArray)} as constructor`
+    );
   }
 
   if (typeof fnOrArray === 'function') {
@@ -205,20 +231,17 @@ function applyParams(fnOrArray: Function|any[]|undefined, key: string): Function
     const fn: Function = fnOrArray[annoLength];
     if (typeof fn !== 'function') {
       throw new Error(
-          `Last position of Class method array must be Function in key ${key} was '${
-                                                                                     stringify(fn)
-                                                                                   }'`);
+        `Last position of Class method array must be Function in key ${key} was '${stringify(
+          fn
+        )}'`
+      );
     }
     if (annoLength != fn.length) {
       throw new Error(
-          `Number of annotations (${
-                                    annoLength
-                                  }) does not match number of arguments (${
-                                                                           fn.length
-                                                                         }) in the function: ${
-                                                                                               stringify(
-                                                                                                   fn)
-                                                                                             }`);
+        `Number of annotations (${annoLength}) does not match number of arguments (${fn.length}) in the function: ${stringify(
+          fn
+        )}`
+      );
     }
     const paramsAnnotations: any[][] = [];
     for (let i = 0, ii = annotations.length - 1; i < ii; i++) {
@@ -240,10 +263,10 @@ function applyParams(fnOrArray: Function|any[]|undefined, key: string): Function
   }
 
   throw new Error(
-      `Only Function or Array is supported in Class definition for key '${key}' is '${
-                                                                                      stringify(
-                                                                                          fnOrArray)
-                                                                                    }'`);
+    `Only Function or Array is supported in Class definition for key '${key}' is '${stringify(
+      fnOrArray
+    )}'`
+  );
 }
 
 /**
@@ -332,26 +355,32 @@ function applyParams(fnOrArray: Function|any[]|undefined, key: string): Function
  */
 export function Class(clsDef: ClassDefinition): Type<any> {
   const constructor = applyParams(
-      clsDef.hasOwnProperty('constructor') ? clsDef.constructor : undefined, 'constructor');
+    clsDef.hasOwnProperty('constructor') ? clsDef.constructor : undefined,
+    'constructor'
+  );
 
   let proto = constructor.prototype;
 
   if (clsDef.hasOwnProperty('extends')) {
     if (typeof clsDef.extends === 'function') {
-      (<Function>constructor).prototype = proto =
-          Object.create((<Function>clsDef.extends).prototype);
+      (<Function>constructor).prototype = proto = Object.create(
+        (<Function>clsDef.extends).prototype
+      );
     } else {
       throw new Error(
-          `Class definition 'extends' property must be a constructor function was: ${
-                                                                                     stringify(
-                                                                                         clsDef
-                                                                                             .extends)
-                                                                                   }`);
+        `Class definition 'extends' property must be a constructor function was: ${stringify(
+          clsDef.extends
+        )}`
+      );
     }
   }
 
   for (const key in clsDef) {
-    if (key !== 'extends' && key !== 'prototype' && clsDef.hasOwnProperty(key)) {
+    if (
+      key !== 'extends' &&
+      key !== 'prototype' &&
+      clsDef.hasOwnProperty(key)
+    ) {
       proto[key] = applyParams(clsDef[key], key);
     }
   }
@@ -372,8 +401,11 @@ export function Class(clsDef: ClassDefinition): Type<any> {
  * @suppress {globalThis}
  */
 export function makeDecorator(
-    name: string, props: {[name: string]: any}, parentClass?: any,
-    chainFn?: (fn: Function) => void): (...args: any[]) => (cls: any) => any {
+  name: string,
+  props: { [name: string]: any },
+  parentClass?: any,
+  chainFn?: (fn: Function) => void
+): (...args: any[]) => (cls: any) => any {
   const metaCtor = makeMetadataCtor([props]);
 
   function DecoratorFactory(objOrType: any): (cls: any) => any {
@@ -388,9 +420,13 @@ export function makeDecorator(
 
     const annotationInstance = new (<any>DecoratorFactory)(objOrType);
     const chainAnnotation =
-        typeof this === 'function' && Array.isArray(this.annotations) ? this.annotations : [];
+      typeof this === 'function' && Array.isArray(this.annotations)
+        ? this.annotations
+        : [];
     chainAnnotation.push(annotationInstance);
-    const TypeDecorator: TypeDecorator = <TypeDecorator>function TypeDecorator(cls: Type<any>) {
+    const TypeDecorator: TypeDecorator = <TypeDecorator>function TypeDecorator(
+      cls: Type<any>
+    ) {
       const annotations = Reflect.getOwnMetadata('annotations', cls) || [];
       annotations.push(annotationInstance);
       Reflect.defineMetadata('annotations', annotations, cls);
@@ -411,9 +447,10 @@ export function makeDecorator(
   return DecoratorFactory;
 }
 
-function makeMetadataCtor(props: ([string, any]|{[key: string]: any})[]): any {
+function makeMetadataCtor(
+  props: ([string, any] | { [key: string]: any })[]
+): any {
   return function ctor(...args: any[]) {
-
     props.forEach((prop, i) => {
       const argVal = args[i];
       if (Array.isArray(prop)) {
@@ -422,7 +459,9 @@ function makeMetadataCtor(props: ([string, any]|{[key: string]: any})[]): any {
       } else {
         for (const propName in prop) {
           this[propName] =
-              argVal && argVal.hasOwnProperty(propName) ? argVal[propName] : prop[propName];
+            argVal && argVal.hasOwnProperty(propName)
+              ? argVal[propName]
+              : prop[propName];
         }
       }
     });
@@ -430,7 +469,10 @@ function makeMetadataCtor(props: ([string, any]|{[key: string]: any})[]): any {
 }
 
 export function makeParamDecorator(
-    name: string, props: ([string, any]|{[name: string]: any})[], parentClass?: any): any {
+  name: string,
+  props: ([string, any] | { [name: string]: any })[],
+  parentClass?: any
+): any {
   const metaCtor = makeMetadataCtor(props);
   function ParamDecoratorFactory(...args: any[]): any {
     if (this instanceof ParamDecoratorFactory) {
@@ -443,7 +485,8 @@ export function makeParamDecorator(
     return ParamDecorator;
 
     function ParamDecorator(cls: any, unusedKey: any, index: number): any {
-      const parameters: (any[]|null)[] = Reflect.getOwnMetadata('parameters', cls) || [];
+      const parameters: (any[] | null)[] =
+        Reflect.getOwnMetadata('parameters', cls) || [];
 
       // there might be gaps if some in between parameters do not have
       // annotations. we pad with nulls.
@@ -467,7 +510,10 @@ export function makeParamDecorator(
 }
 
 export function makePropDecorator(
-    name: string, props: ([string, any]|{[key: string]: any})[], parentClass?: any): any {
+  name: string,
+  props: ([string, any] | { [key: string]: any })[],
+  parentClass?: any
+): any {
   const metaCtor = makeMetadataCtor(props);
 
   function PropDecoratorFactory(...args: any[]): any {
@@ -479,8 +525,9 @@ export function makePropDecorator(
     const decoratorInstance = new (<any>PropDecoratorFactory)(...args);
 
     return function PropDecorator(target: any, name: string) {
-      const meta = Reflect.getOwnMetadata('propMetadata', target.constructor) || {};
-      meta[name] = meta.hasOwnProperty(name) && meta[name] || [];
+      const meta =
+        Reflect.getOwnMetadata('propMetadata', target.constructor) || {};
+      meta[name] = (meta.hasOwnProperty(name) && meta[name]) || [];
       meta[name].unshift(decoratorInstance);
       Reflect.defineMetadata('propMetadata', meta, target.constructor);
     };

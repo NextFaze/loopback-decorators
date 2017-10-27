@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 
-import {expect} from 'chai';
-import {spy} from 'sinon';
-import {Validate} from '../';
-import {validateArgs, validateMetadataKey} from '../lib/validate';
+import { expect } from 'chai';
+import { spy } from 'sinon';
+import { Validate } from '../';
+import { validateArgs, validateMetadataKey } from '../lib/validate';
 const ValidationError = require('loopback').ValidationError;
 
 describe('@Validate', () => {
@@ -18,7 +18,7 @@ describe('@Validate', () => {
 
 describe('validateArgs / getValid', () => {
   it('should call the validate each of the validatable args', async () => {
-    const validatable = {isValid: spy((cb: Function) => cb(true))};
+    const validatable = { isValid: spy((cb: Function) => cb(true)) };
     class Remote {
       onRemote(app: any, @Validate payload: any = validatable) {}
     }
@@ -30,13 +30,14 @@ describe('validateArgs / getValid', () => {
     const validatable = {
       errors: ['not dank enough'],
       isValid: spy((cb: Function) => cb(false)),
-      toJSON: () => {}
+      toJSON: () => {},
     };
     class Remote {
       onRemote(app: any, @Validate payload: any = validatable) {}
     }
-    await expect(validateArgs([{}, validatable], Remote))
-        .to.eventually.be.rejectedWith(ValidationError);
+    await expect(
+      validateArgs([{}, validatable], Remote)
+    ).to.eventually.be.rejectedWith(ValidationError);
     expect(validatable.isValid.calledOnce).to.be.true;
   });
-})
+});

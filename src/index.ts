@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 
-import {createEventMethod} from './lib/create-event';
-import {createRemoteMethod} from './lib/create-remote';
-import {makeDecorator} from './lib/type-decorators';
+import { createEventMethod } from './lib/create-event';
+import { createRemoteMethod } from './lib/create-remote';
+import { makeDecorator } from './lib/type-decorators';
 
-export {Response} from './lib/response';
-export {Validate} from './lib/validate';
+export { Response } from './lib/response';
+export { Validate } from './lib/validate';
 
 /**
  * Configuration fo rthe remote method model
@@ -67,10 +67,12 @@ export function RemoteMethodModule(options: IModuleOptions) {
             (options.proxyMethods || []).forEach(method => {
               if (method.indexOf('prototype.') === 0) {
                 let methodName = method.split('.').pop();
-                Model.prototype[methodName] = async function instance(...args: any[]) {
+                Model.prototype[methodName] = async function instance(
+                  ...args: any[]
+                ) {
                   let instance = this;
                   if (this.toJSON) {
-                    let data = {...this.toJSON()};
+                    let data = { ...this.toJSON() };
                     if (this.isNewRecord()) {
                       data.id = undefined;
                     }
@@ -78,13 +80,21 @@ export function RemoteMethodModule(options: IModuleOptions) {
                     instance.__persisted = this.__persisted;
                   }
                   return await getResult(
-                      ProxyFor.prototype[methodName].bind(instance), Model, options.strict, args);
-                }
+                    ProxyFor.prototype[methodName].bind(instance),
+                    Model,
+                    options.strict,
+                    args
+                  );
+                };
               } else {
                 Model[method] = async function(...args: any[]) {
                   return await getResult(
-                      ProxyFor[method].bind(ProxyFor), Model, options.strict, args);
-                }
+                    ProxyFor[method].bind(ProxyFor),
+                    Model,
+                    options.strict,
+                    args
+                  );
+                };
               }
             });
           });
@@ -106,7 +116,12 @@ export function RemoteMethodModule(options: IModuleOptions) {
   };
 }
 
-async function getResult(callMethod: Function, ProxyModel: any, strict: boolean, args: any[]) {
+async function getResult(
+  callMethod: Function,
+  ProxyModel: any,
+  strict: boolean,
+  args: any[]
+) {
   let cb = getCallback(args);
   if (cb) {
     args = args.slice(0, -1);
@@ -153,7 +168,12 @@ function toProxy(ProxyModel: any, res: any) {
   }
 }
 
-export const RemoteMethod: any =
-    makeDecorator('RemoteMethod', {selector: undefined, meta: undefined, providers: undefined});
-export const ModelEvent: any =
-    makeDecorator('ModelEvent', {selector: undefined, providers: undefined});
+export const RemoteMethod: any = makeDecorator('RemoteMethod', {
+  selector: undefined,
+  meta: undefined,
+  providers: undefined,
+});
+export const ModelEvent: any = makeDecorator('ModelEvent', {
+  selector: undefined,
+  providers: undefined,
+});
