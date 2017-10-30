@@ -1,6 +1,6 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
-import {RemoteMethodModule} from '../';
+import { RemoteMethodModule } from '../';
 
 const loopback = require('loopback');
 
@@ -12,9 +12,16 @@ describe('@RemoteMethodModule Decorator', () => {
     let decorated;
     before('Configure proxy', () => {
       const app = loopback();
-      internalModel = loopback.Model.extend(`Internal${Date.now()}`, {prop: 'string'}, {});
-      externalModel =
-          loopback.Model.extend(`External${Date.now()}`, {}, {idInjection: false, forceId: false});
+      internalModel = loopback.Model.extend(
+        `Internal${Date.now()}`,
+        { prop: 'string' },
+        {}
+      );
+      externalModel = loopback.Model.extend(
+        `External${Date.now()}`,
+        {},
+        { idInjection: false, forceId: false }
+      );
       let memory = loopback.memory();
       internalModel.attachTo(memory);
       externalModel.attachTo(memory);
@@ -23,7 +30,7 @@ describe('@RemoteMethodModule Decorator', () => {
 
       @RemoteMethodModule({
         proxyFor: internalModel.modelName,
-        proxyMethods: ['findById', 'prototype.updateAttributes']
+        proxyMethods: ['findById', 'prototype.updateAttributes'],
       })
       class ModelClass {
         constructor(public model: any) {}
@@ -34,7 +41,7 @@ describe('@RemoteMethodModule Decorator', () => {
     });
 
     before('Create instances', async () => {
-      instance = await internalModel.create({prop: 'hello'});
+      instance = await internalModel.create({ prop: 'hello' });
     });
 
     it('proxies a static method to a target internal model', async () => {
@@ -48,7 +55,7 @@ describe('@RemoteMethodModule Decorator', () => {
       // create an external model instance that will have the same id as the internal one
       let model = await externalModel.create();
       // save some changes which should trigger the save on the internal we proxy for
-      let updated = await model.updateAttributes({prop: 'goodbye'});
+      let updated = await model.updateAttributes({ prop: 'goodbye' });
       instance = await instance.reload();
       expect(instance).to.have.property('prop', 'goodbye');
     });
@@ -58,11 +65,16 @@ describe('@RemoteMethodModule Decorator', () => {
     let internalModel: any, externalModel: any, decorated: any, instance: any;
     before('Configure proxy', () => {
       const app = loopback();
-      internalModel =
-          loopback.Model.extend(`Internal${Date.now()}`, {secret: 'string', prop: 'string'}, {});
+      internalModel = loopback.Model.extend(
+        `Internal${Date.now()}`,
+        { secret: 'string', prop: 'string' },
+        {}
+      );
       externalModel = loopback.Model.extend(
-          `External${Date.now()}`, {prop: 'string'},
-          {strict: true, idInjection: false, forceId: false});
+        `External${Date.now()}`,
+        { prop: 'string' },
+        { strict: true, idInjection: false, forceId: false }
+      );
       let memory = loopback.memory();
       internalModel.attachTo(memory);
       externalModel.attachTo(memory);
@@ -72,7 +84,12 @@ describe('@RemoteMethodModule Decorator', () => {
       @RemoteMethodModule({
         proxyFor: internalModel.modelName,
         strict: true,
-        proxyMethods: ['find', 'findById', 'create', 'prototype.updateAttributes']
+        proxyMethods: [
+          'find',
+          'findById',
+          'create',
+          'prototype.updateAttributes',
+        ],
       })
       class ModelClass {
         constructor(public model: any) {}
@@ -83,12 +100,12 @@ describe('@RemoteMethodModule Decorator', () => {
     });
 
     before('Create instances', async () => {
-      instance = await internalModel.create({prop: 'hello'});
+      instance = await internalModel.create({ prop: 'hello' });
     });
 
     it('proxies findById to another model returning an instance of the proxy', async () => {
       let result = await externalModel.findById(instance.id);
-      expect(result).to.be.an.instanceof (externalModel);
+      expect(result).to.be.an.instanceof(externalModel);
       expect(result).to.have.property('prop', 'hello');
       expect(result).not.to.have.property('secret');
     });
@@ -96,18 +113,18 @@ describe('@RemoteMethodModule Decorator', () => {
       let result = await externalModel.find();
       expect(result).to.be.an('array');
       let item = result[0];
-      expect(item).to.be.an.instanceof (externalModel);
+      expect(item).to.be.an.instanceof(externalModel);
       expect(item).to.have.property('prop', 'hello');
       expect(item).not.to.have.property('secret');
     });
     it('proxies writes to the underlying model', async () => {
       let result = await externalModel.findById(instance.id);
-      await result.updateAttributes({prop: 'hi'});
+      await result.updateAttributes({ prop: 'hi' });
       let updated = await internalModel.findById(instance.id);
       expect(updated).to.have.property('prop', 'hi');
     });
     it('proxies creation to the underlying model', async () => {
-      let inst = await externalModel.create({prop: 'greetings'});
+      let inst = await externalModel.create({ prop: 'greetings' });
       let updated = await internalModel.findById(inst.id);
       expect(updated).to.have.property('prop', 'greetings');
     });
