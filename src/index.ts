@@ -15,19 +15,23 @@ export { Validate } from './lib/validate';
  */
 export interface IModuleOptions {
   /**
-   * Remote methods to include as part of this module, decorated with @RemoteMethod
-   *
-   * @type {any[]}
-   * @memberof IModuleOptions
-   */
-  remotes?: any[];
-  /**
    * Model events to include as part of this module, decorated with @ModelEvent
    *
    * @type {any[]}
    * @memberof IModuleOptions
    */
   events?: any[];
+  /**
+   * Whether or not this is a strict proxy - i.e returns an instance of this model instead of the
+   * proxied one.
+   *
+   * @type {boolean}
+   * @memberof IModuleOptions
+   */
+  strict?: boolean;
+}
+
+export interface IRemoteModuleOptions extends IModuleOptions {
   /**
    * The name of the model that this is a remote proxy for
    *
@@ -43,77 +47,90 @@ export interface IModuleOptions {
    */
   proxyMethods?: string[];
   /**
-   * Whether or not this is a strict proxy - i.e returns an instance of this model instead of the
-   * proxied one.
+   * Remote methods to include as part of this module, decorated with @RemoteMethod
    *
-   * @type {boolean}
+   * @type {any[]}
    * @memberof IModuleOptions
    */
-  strict?: boolean;
+  remotes?: any[];
 }
 
-export function RemoteMethodModule(options: IModuleOptions) {
-  return function RemoteMethodModule(ctor: Function) {
+function makeLoopbackDectorator(handler: (Model: any) => void) {
+  return function ModelModuleConfigure(ctor: Function) {
     // save a reference to the original constructor
     const Original: any = ctor;
-
     // the new constructor behaviour
-    let f: any = function(...args: any[]) {
+    let f: any = function (...args: any[]) {
       let Model = args[0];
-      if (options.proxyFor) {
-        Model.getApp((err: Error, app: any) => {
-          app.once('booted', () => {
-            const ProxyFor = app.models[options.proxyFor];
-            (options.proxyMethods || []).forEach(method => {
-              if (method.indexOf('prototype.') === 0) {
-                let methodName = method.split('.').pop();
-                Model.prototype[methodName] = async function instance(
-                  ...args: any[]
-                ) {
-                  let instance = this;
-                  if (this.toJSON) {
-                    let data = { ...this.toJSON() };
-                    if (this.isNewRecord()) {
-                      data.id = undefined;
-                    }
-                    instance = new ProxyFor(data);
-                    instance.__persisted = this.__persisted;
-                  }
-                  return await getResult(
-                    ProxyFor.prototype[methodName].bind(instance),
-                    Model,
-                    options.strict,
-                    args
-                  );
-                };
-              } else {
-                Model[method] = async function(...args: any[]) {
-                  return await getResult(
-                    ProxyFor[method].bind(ProxyFor),
-                    Model,
-                    options.strict,
-                    args
-                  );
-                };
-              }
-            });
-          });
-        });
-      }
+      handler(Model);
 
-      (options.remotes || []).forEach((RemoteMethod: any) => {
-        let meta = Reflect.getMetadata('annotations', RemoteMethod);
-        meta.forEach(createRemoteMethod.bind({}, Model, RemoteMethod));
-      });
-      (options.events || []).forEach((ModelEvent: any) => {
-        let meta = Reflect.getMetadata('annotations', ModelEvent);
-        meta.forEach(createEventMethod.bind({}, Model, ModelEvent));
-      });
       return new Original(...args);
-    };
+    }
+
     f.prototype = Original.prototype;
     return f;
-  };
+  }
+}
+
+export function ModelModule(options: IModuleOptions) {
+  return makeLoopbackDectorator((Model: any) => {
+    (options.events || []).forEach((ModelEvent: any) => {
+      let meta = Reflect.getMetadata('annotations', ModelEvent);
+      meta.forEach(createEventMethod.bind({}, Model, ModelEvent));
+    });
+  });
+}
+
+export function RemoteMethodModule(options: IRemoteModuleOptions) {
+  return makeLoopbackDectorator((Model: any) => {
+    (options.remotes || []).forEach((RemoteMethod: any) => {
+      let meta = Reflect.getMetadata('annotations', RemoteMethod);
+      meta.forEach(createRemoteMethod.bind({}, Model, RemoteMethod));
+    });
+    if (!options.proxyFor) {
+      return;
+    }
+    Model.getApp((err: Error, app: any) => {
+      app.once('booted', () => configureProxy(Model, app, options));
+    });
+  });
+}
+
+function configureProxy(Model: any, app: any, options: IRemoteModuleOptions) {
+  const ProxyFor = app.models[options.proxyFor];
+  (options.proxyMethods || []).forEach(method => {
+    if (method.indexOf('prototype.') === 0) {
+      let methodName = method.split('.').pop();
+      Model.prototype[methodName] = async function instance(
+        ...args: any[]
+      ) {
+        let instance = this;
+        if (this.toJSON) {
+          let data = { ...this.toJSON() };
+          if (this.isNewRecord()) {
+            data.id = undefined;
+          }
+          instance = new ProxyFor(data);
+          instance.__persisted = this.__persisted;
+        }
+        return await getResult(
+          ProxyFor.prototype[methodName].bind(instance),
+          Model,
+          options.strict,
+          args
+        );
+      };
+    } else {
+      Model[method] = async function (...args: any[]) {
+        return await getResult(
+          ProxyFor[method].bind(ProxyFor),
+          Model,
+          options.strict,
+          args
+        );
+      };
+    }
+  });
 }
 
 async function getResult(
