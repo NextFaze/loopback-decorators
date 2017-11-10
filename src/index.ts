@@ -8,6 +8,7 @@ import { makeDecorator } from './lib/type-decorators';
 export { Response } from './lib/response';
 export { Validate } from './lib/validate';
 export * from './lib/boot';
+export * from './lib/model';
 export * from './lib/application';
 
 /**
