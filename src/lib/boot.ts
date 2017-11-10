@@ -24,13 +24,23 @@ export function nfBoot(app: any, config: any): Promise<any> {
     lbConfig.models = {};
     lbConfig.modelDefinitions = [];
     config.models.forEach((model: any) => {
-      lbConfig.models[model.name] = {
-        name: model.name,
-        dataSource: null
+      const definition = Reflect.getMetadata(modelDefinitionKey, model)
+      if (definition) {
+        lbConfig.models[model.name] = {
+          name: model.name,
+          ...definition.config
+        }
+        lbConfig.modelDefinitions.push({
+          definition
+        });
+      } else if (model.provide) {
+        let value = model.useFactory ? model.useFactory : model.useValue;
+        lbConfig.models[model.provide] = {
+          name: model.provide,
+          ...value.config
+        };
+        lbConfig.modelDefinitions.push(value.definition);
       }
-      lbConfig.modelDefinitions.push({
-        definition: Reflect.getMetadata(modelDefinitionKey, model)
-      });
     });
 
     boot(app, lbConfig, function (err: Error) {
