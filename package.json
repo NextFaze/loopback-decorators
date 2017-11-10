@@ -48,5 +48,8 @@
     "ts-node": "^2.0.0",
     "typescript": "2.1.5",
     "yargs": "^6.6.0"
+  },
+  "dependencies": {
+    "loopback-boot": "^2.27.0"
   }
 }

@@ -2,10 +2,13 @@ import 'reflect-metadata';
 
 import { createEventMethod } from './lib/create-event';
 import { createRemoteMethod } from './lib/create-remote';
+import { makeLoopbackDectorator } from './lib/make-loopback-decorator';
 import { makeDecorator } from './lib/type-decorators';
 
 export { Response } from './lib/response';
 export { Validate } from './lib/validate';
+export * from './lib/boot';
+export * from './lib/application';
 
 /**
  * Configuration fo rthe remote method model
@@ -55,22 +58,6 @@ export interface IRemoteModuleOptions extends IModuleOptions {
   remotes?: any[];
 }
 
-function makeLoopbackDectorator(handler: (Model: any) => void) {
-  return function ModelModuleConfigure(ctor: Function) {
-    // save a reference to the original constructor
-    const Original: any = ctor;
-    // the new constructor behaviour
-    let f: any = function (...args: any[]) {
-      let Model = args[0];
-      handler(Model);
-
-      return new Original(...args);
-    }
-
-    f.prototype = Original.prototype;
-    return f;
-  }
-}
 
 export function ModelModule(options: IModuleOptions) {
   return makeLoopbackDectorator((Model: any) => {
