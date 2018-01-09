@@ -8,7 +8,7 @@ export { Response } from './lib/response';
 export { Validate } from './lib/validate';
 
 /**
- * Configuration fo rthe remote method model
+ * Configuration for the remote method model
  *
  * @export
  * @interface IModuleOptions
