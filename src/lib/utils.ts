@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import {
-  Request,
+  Req,
   Application,
   ModelInstance,
-  Response,
+  Res,
   AccessToken,
   RemotingContext,
   Headers,
@@ -77,8 +77,8 @@ export function $resolve(dep: any = [], args: any[]) {
       });
     }
     case RemotingContext:
-    case Request:
-    case Response:
+    case Req:
+    case Res:
     case AccessToken:
     case Headers: {
       let ctx = findContextArgument(args);
@@ -125,9 +125,9 @@ export function resolveFromContext(arg: any, ctx: any) {
     case '@ctx':
     case '@context':
       return ctx;
-    case Request:
+    case Req:
       return ctx.req;
-    case Response:
+    case Res:
     case AccessToken:
     case '@accessToken':
       return ctx.req.accessToken;

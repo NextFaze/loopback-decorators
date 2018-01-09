@@ -6,6 +6,15 @@ import { makeDecorator } from './lib/type-decorators';
 
 export { Response } from './lib/response';
 export { Validate } from './lib/validate';
+export {
+  Application,
+  ModelInstance,
+  RemotingContext,
+  Req,
+  Res,
+  AccessToken,
+  Headers,
+} from './lib/create-remote';
 
 /**
  * Configuration for the remote method model

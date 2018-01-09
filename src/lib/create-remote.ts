@@ -73,14 +73,8 @@ export const Application = Symbol('Application');
 export const ModelInstance = Symbol('Instance');
 
 export const RemotingContext = Symbol('Context');
-export const Request = Symbol('Request');
-export const Response = Symbol('Response');
+export const Req = Symbol('Request');
+export const Res = Symbol('Response');
 export const AccessToken = Symbol('AccessToken');
 export const Headers = Symbol('AccessToken');
-export const CTX_PROVIDERS = [
-  RemotingContext,
-  Request,
-  Response,
-  AccessToken,
-  Headers,
-];
+export const CTX_PROVIDERS = [RemotingContext, Req, Res, AccessToken, Headers];

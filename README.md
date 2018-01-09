@@ -40,8 +40,8 @@ If you don't like strings, loopback decorators also exports several 'injection t
 | Application     | '$app'         |
 | ModelInstance   | '$instance'    |
 | RemotingContext | '@ctx'         |
-| Request         | '@req'         |
-| Response        | '@res'         |
+| Req             | '@req'         |
+| Res             | '@res'         |
 | AccessToken     | '@accessToken' |
 | Headers         | '@headers'     |
 
