@@ -77,17 +77,10 @@ export function $resolve(dep: any = [], args: any[]) {
       });
     }
     case RemotingContext:
-    case '@':
-    case '@context':
-    case '@ctx':
     case Request:
-    case '@req':
     case Response:
-    case '@res':
     case AccessToken:
-    case '@accessToken':
-    case Headers:
-    case '@headers': {
+    case Headers: {
       let ctx = findContextArgument(args);
       if (!ctx) {
         throw new Error('Failed to resolve context argument for this function');
@@ -129,6 +122,7 @@ export function resolveFromContext(arg: any, ctx: any) {
   switch (arg) {
     case RemotingContext:
     case '@':
+    case '@ctx':
     case '@context':
       return ctx;
     case Request:
