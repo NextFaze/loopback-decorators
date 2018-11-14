@@ -71,6 +71,9 @@ export function $resolve(httpContext: any, dep: any = []) {
     case '$req': {
       return httpContext.req;
     }
+    case '$headers': {
+      return httpContext.req.headers;
+    }
     case '$res': {
       return httpContext.res;
     }

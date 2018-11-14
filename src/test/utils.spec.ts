@@ -99,6 +99,20 @@ describe('$resolve', () => {
     ]);
   });
 
+  it('should resolve the http request', async () => {
+    const app = {};
+    const mockCtor = () => {};
+    (<any>mockCtor).getApp = (cb: Function) => cb(null, app);
+    const mockInstance = { constructor: mockCtor };
+    const req = { headers: { 'Content-Type': 'application/json' } };
+    await expect(
+      $resolve.call(mockInstance, { req }, ['$req'])
+    ).to.eventually.eql([req]);
+    await expect(
+      $resolve.call(mockCtor, { req }, ['$headers'])
+    ).to.eventually.eql([{ 'Content-Type': 'application/json' }]);
+  });
+
   it('should resolve the http response', async () => {
     const app = {};
     const mockCtor = () => {};

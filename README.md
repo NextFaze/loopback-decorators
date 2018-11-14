@@ -26,6 +26,7 @@ Loopback decorators provides several special provider tokens for common remote m
 | `$ctx`                | The loopback http remoting context                                                                                                          |
 | `$req`                | The loopback http request                                                                                                                   |
 | `$res`                | The loopback http response                                                                                                                  |
+| `$headers`            | The incoming http request headers                                                                                                           |
 | `$optionsFromRequest` | See [using options from request](https://loopback.io/doc/en/lb3/Using-current-context.html#annotate-options-parameter-in-remoting-metadata) |
 | `$options`            | Alias for `$optionsFromRequest`                                                                                                             |
 | `^SomeModelName`      | Any model registered in your loopback model registry                                                                                        |
