@@ -1,6 +1,6 @@
 {
   "name": "loopback-decorators",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "description": "Remote method decorators for loopback",
   "main": "dist/prod/index.js",
   "typings": "dist/prod/index.d.ts",
@@ -8,7 +8,8 @@
     "build.dev": "gulp build.dev --color --config-env dev",
     "build.prod": "gulp build.prod --color --config-env prod",
     "pretest": "npm run build.dev",
-    "test": "mocha --require source-map-support/register dist/dev/test/*.spec.js"
+    "test": "mocha --require source-map-support/register dist/dev/test/*.spec.js",
+    "test.dev": "npm run pretest && node --inspect --inspect-brk ./node_modules/.bin/_mocha --require source-map-support/register dist/dev/test/*.spec.js"
   },
   "author": "nextfaze",
   "license": "MIT",
@@ -45,6 +46,7 @@
     "rimraf": "^2.5.4",
     "run-sequence": "^1.2.2",
     "sinon": "^2.4.1",
+    "supertest": "^3.3.0",
     "ts-node": "^2.0.0",
     "typescript": "2.1.5",
     "yargs": "^6.6.0"
