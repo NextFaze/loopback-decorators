@@ -97,7 +97,22 @@ export function $resolve(httpContext: any, dep: any = []) {
       }
     });
   }
-  return getAsync.call(this, dep);
+
+  if (dep.split('.').length > 1) {
+    try {
+      // Try to fish out of context argument
+      return dep
+        .slice(1)
+        .split('.')
+        .reduce((prev: any, next: string) => prev[next], httpContext);
+    } catch (ex) {}
+  }
+  // Final fallback - to resolve as a method on the model
+  try {
+    return getAsync.call(this, dep);
+  } catch (ex) {
+    throw new Error(`Unable to resolve dependency ${dep}`);
+  }
 }
 
 // https://github.com/strongloop/loopback/blob/1c30628a8a15aca412de6b6f34036ff979e675f8/lib/model.js#L494-L503

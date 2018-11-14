@@ -1,4 +1,4 @@
-import { buildResponse } from './response';
+import { buildResponse, responseMetadataKey } from './response';
 import { resolve } from './utils';
 import { validateArgs } from './validate';
 
@@ -10,15 +10,17 @@ export function createRemoteMethod(
   let { selector, meta, providers } = props;
 
   // Inject context into the accepts that we can use
-  const accepts = meta ? meta.accepts || [] : [];
+  let accepts = meta ? meta.accepts || [] : [];
+  if (!Array.isArray(accepts)) {
+    accepts = [accepts];
+  }
   meta.accepts = [
     {
       arg: 'decoratorsContext',
       type: 'object',
       http: (ctx: any) => ctx,
     },
-    ...accepts,
-  ];
+  ].concat(accepts);
 
   if (meta.isStatic) {
     RemoteClass[selector] = async function(...allArgs: any[]) {
