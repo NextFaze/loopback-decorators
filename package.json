@@ -1,6 +1,6 @@
 {
   "name": "loopback-decorators",
-  "version": "0.0.13",
+  "version": "0.1.1",
   "description": "Remote method decorators for loopback",
   "main": "dist/prod/index.js",
   "typings": "dist/prod/index.d.ts",
