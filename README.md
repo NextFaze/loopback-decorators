@@ -18,18 +18,19 @@ npm install loopback-decorators
 
 Loopback decorators provides several special provider tokens for common remote method dependencies. These are:
 
-| Token                 | Provides                                                                                                                                    |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `$app`                | The loopback application (similar to `require('./server')`)                                                                                 |
-| `$instance`           | The model instance for non-static remote methods                                                                                            |
-| `$model`              | The model being operated on (for both static and non-static methods)                                                                        |
-| `$ctx`                | The loopback http remoting context                                                                                                          |
-| `$req`                | The loopback http request                                                                                                                   |
-| `$res`                | The loopback http response                                                                                                                  |
-| `$headers`            | The incoming http request headers                                                                                                           |
-| `$optionsFromRequest` | See [using options from request](https://loopback.io/doc/en/lb3/Using-current-context.html#annotate-options-parameter-in-remoting-metadata) |
-| `$options`            | Alias for `$optionsFromRequest`                                                                                                             |
-| `^SomeModelName`      | Any model registered in your loopback model registry                                                                                        |
+| Token                           | Provides                                                                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `$app`                          | The loopback application (similar to `require('./server')`)                                                                                 |
+| `$instance`                     | The model instance for non-static remote methods                                                                                            |
+| `$model`                        | The model being operated on (for both static and non-static methods)                                                                        |
+| `$ctx`                          | The loopback http remoting context                                                                                                          |
+| `$req`                          | The loopback http request                                                                                                                   |
+| `$res`                          | The loopback http response                                                                                                                  |
+| `$headers`                      | The incoming http request headers                                                                                                           |
+| `$ctx.req.headers.to.something` | Pull arbitrary value off ctx                                                                                                                |
+| `$optionsFromRequest`           | See [using options from request](https://loopback.io/doc/en/lb3/Using-current-context.html#annotate-options-parameter-in-remoting-metadata) |
+| `$options`                      | Alias for `$optionsFromRequest`                                                                                                             |
+| `^SomeModelName`                | Any model registered in your loopback model registry                                                                                        |
 
 You can also setup your own providers (even with their own dependencies) as follows (see examples for further info):
 
