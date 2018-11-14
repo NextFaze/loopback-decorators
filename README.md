@@ -14,38 +14,68 @@ Within your node project, install the package from npm using:
 npm install loopback-decorators
 ```
 
+## Special Providers
+
+Loopback decorators provides several special provider tokens for common remote method dependencies. These are:
+
+| Token                 | Provides                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `$app`                | The loopback application (similar to `require('./server')`)                                                                                 |
+| `$instance`           | The model instance for non-static remote methods                                                                                            |
+| `$model`              | The model being operated on (for both static and non-static methods)                                                                        |
+| `$ctx`                | The loopback http remoting context                                                                                                          |
+| `$req`                | The loopback http request                                                                                                                   |
+| `$res`                | The loopback http response                                                                                                                  |
+| `$optionsFromRequest` | See [using options from request](https://loopback.io/doc/en/lb3/Using-current-context.html#annotate-options-parameter-in-remoting-metadata) |
+| `$options`            | Alias for `$optionsFromRequest`                                                                                                             |
+| `^SomeModelName`      | Any model registered in your loopback model registry                                                                                        |
+
+You can also setup your own providers (even with their own dependencies) as follows (see examples for further info):
+
+```
+{
+  provide: 'tokenName',
+  useFactory: (list, of, deps) => someValue,
+  deps: ['$app', 'someDep', '^MyModel']
+}
+```
+
 # Example Remote Method
 
 A basic controller:
 
 ```ts
-import {RemoteMethod} from 'loopback-decorators';
+import { RemoteMethod } from 'loopback-decorators';
 
 @RemoteMethod({
   selector: 'getStuff',
   providers: [
-    '$app', '$instance', {
+    '$app',
+    '$instance',
+    {
       provide: 'customEntity',
       useFactory: function(modelName) {
-        return modelName.customEntityÏ
+        return modelName.customEntityÏ;
       },
-      deps: ['modelName']
-    }
+      deps: ['modelName'],
+    },
   ],
   meta: {
     accessType: 'EXECUTE',
     isStatic: false,
     description: 'Get some stuff from a models remote method',
-    accepts: [{
-      arg: 'accessToken',
-      type: 'any',
-      http: function(ctx) {
-        return ctx.req.accessToken;
-      }
-    }],
-    returns: {arg: 'res', type: 'stuff', root: true},
-    http: {path: '/get-stuff', verb: 'get'}
-  }
+    accepts: [
+      {
+        arg: 'accessToken',
+        type: 'any',
+        http: function(ctx) {
+          return ctx.req.accessToken;
+        },
+      },
+    ],
+    returns: { arg: 'res', type: 'stuff', root: true },
+    http: { path: '/get-stuff', verb: 'get' },
+  },
 })
 export class GetStuffRemote {
   constructor(public app, public instance, public customEntity) {}
@@ -53,7 +83,6 @@ export class GetStuffRemote {
     // This is where you put the remote method logic
   }
 }
-
 ```
 
 # Example ModelEvent
@@ -83,23 +112,21 @@ export class DoSomethingOnCreate {
 # Setting up your remote module
 
 ```ts
-import {RemoteMethodModule} from 'loopback-decorators';
+import { RemoteMethodModule } from 'loopback-decorators';
 
 @RemoteMethodModule({
   remotes: [GetStuffRemote],
   events: [DoSomethingOnCreate],
   proxyFor: 'ModelInternal',
-  proxyMethods: ['find', 'findById']
+  proxyMethods: ['find', 'findById'],
 })
 export class ModelAPI {
-  constructor(public Model: any) {
-  }
+  constructor(public Model: any) {}
 }
 
 export = function(Model: any) {
   return new ModelAPI(Model);
 };
-
 ```
 
 # Validating Remote Inputs
@@ -111,14 +138,16 @@ export = function(Model: any) {
     accessType: 'WRITE',
     isStatic: false,
     description: 'Create a thing',
-    accepts: [{
-      arg: 'payload',
-      type: 'RequestModelType',
-      http: { source: 'body' }
-    }],
-    returns: {arg: 'res', type: 'stuff', root: true},
-    http: {path: '/things', verb: 'post'}
-  }
+    accepts: [
+      {
+        arg: 'payload',
+        type: 'RequestModelType',
+        http: { source: 'body' },
+      },
+    ],
+    returns: { arg: 'res', type: 'stuff', root: true },
+    http: { path: '/things', verb: 'post' },
+  },
 })
 export class GetStuffRemote {
   constructor(public app, public instance, public customEntity) {}
@@ -161,7 +190,6 @@ You can also pass the config directly:
   // Or, for an array
   @Response({ responseClass: 'MyResponseClass', isMulti: true })
 ```
-
 
 # License
 
