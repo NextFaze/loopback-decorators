@@ -109,6 +109,14 @@ describe('@RemoteMethodModule Decorator', () => {
       expect(result).to.have.property('prop', 'hello');
       expect(result).not.to.have.property('secret');
     });
+    it('proxies findById to another model returning an instance of the proxy using callback', done => {
+      externalModel.findById(instance.id, (err: any, result: any) => {
+        expect(result).to.be.an.instanceof(externalModel);
+        expect(result).to.have.property('prop', 'hello');
+        expect(result).not.to.have.property('secret');
+        done(err);
+      });
+    });
     it('proxies find to another model returning an instance of the proxy', async () => {
       let result = await externalModel.find();
       expect(result).to.be.an('array');
@@ -116,6 +124,16 @@ describe('@RemoteMethodModule Decorator', () => {
       expect(item).to.be.an.instanceof(externalModel);
       expect(item).to.have.property('prop', 'hello');
       expect(item).not.to.have.property('secret');
+    });
+    it('proxies find to another model returning an instance of the proxy using callback', done => {
+      externalModel.find((err: any, result: any) => {
+        expect(result).to.be.an('array');
+        let item = result[0];
+        expect(item).to.be.an.instanceof(externalModel);
+        expect(item).to.have.property('prop', 'hello');
+        expect(item).not.to.have.property('secret');
+        done(err);
+      });
     });
     it('proxies writes to the underlying model', async () => {
       let result = await externalModel.findById(instance.id);

@@ -67,7 +67,7 @@ export function RemoteMethodModule(options: IModuleOptions) {
             (options.proxyMethods || []).forEach(method => {
               if (method.indexOf('prototype.') === 0) {
                 let methodName = method.split('.').pop();
-                Model.prototype[methodName] = async function instance(
+                Model.prototype[methodName] = function instance(
                   ...args: any[]
                 ) {
                   let instance = this;
@@ -79,7 +79,7 @@ export function RemoteMethodModule(options: IModuleOptions) {
                     instance = new ProxyFor(data);
                     instance.__persisted = this.__persisted;
                   }
-                  return await getResult(
+                  return getResult(
                     ProxyFor.prototype[methodName].bind(instance),
                     Model,
                     options.strict,
@@ -87,8 +87,8 @@ export function RemoteMethodModule(options: IModuleOptions) {
                   );
                 };
               } else {
-                Model[method] = async function(...args: any[]) {
-                  return await getResult(
+                Model[method] = function(...args: any[]) {
+                  return getResult(
                     ProxyFor[method].bind(ProxyFor),
                     Model,
                     options.strict,
@@ -116,7 +116,7 @@ export function RemoteMethodModule(options: IModuleOptions) {
   };
 }
 
-async function getResult(
+function getResult(
   callMethod: Function,
   ProxyModel: any,
   strict: boolean,
@@ -125,25 +125,24 @@ async function getResult(
   let cb = getCallback(args);
   if (cb) {
     args = args.slice(0, -1);
-  }
-  try {
-    let result = await callMethod(...args);
+    callMethod(...args, (err: any, result: any) => {
+      if (strict) {
+        cb(err, mapResponse(ProxyModel, result));
+      } else {
+        cb(err, result);
+      }
+    });
+  } else {
     if (strict) {
-      result = mapResponse(ProxyModel, result);
+      return callMethod(...args).then((result: any) =>
+        mapResponse(ProxyModel, result)
+      );
     }
-    if (cb) {
-      cb(null, result);
-    }
-    return result;
-  } catch (ex) {
-    if (cb) {
-      return cb(ex);
-    }
-    throw ex;
+    return callMethod(...args);
   }
 }
 
-function getCallback(...args: any[]) {
+function getCallback(args: any[]) {
   if (typeof args[args.length - 1] === 'function') {
     return args[args.length - 1];
   }
