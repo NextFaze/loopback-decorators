@@ -1,6 +1,9 @@
+import * as chai from 'chai';
 import { expect } from 'chai';
-
+import * as promised from 'chai-as-promised';
 import { RemoteMethodModule } from '../';
+
+chai.use(promised);
 
 const loopback = require('loopback');
 
@@ -109,6 +112,14 @@ describe('@RemoteMethodModule Decorator', () => {
       expect(result).to.have.property('prop', 'hello');
       expect(result).not.to.have.property('secret');
     });
+    it('proxies findById to another model returning an instance of the proxy using callback', done => {
+      externalModel.findById(instance.id, (err: any, result: any) => {
+        expect(result).to.be.an.instanceof(externalModel);
+        expect(result).to.have.property('prop', 'hello');
+        expect(result).not.to.have.property('secret');
+        done(err);
+      });
+    });
     it('proxies find to another model returning an instance of the proxy', async () => {
       let result = await externalModel.find();
       expect(result).to.be.an('array');
@@ -116,6 +127,16 @@ describe('@RemoteMethodModule Decorator', () => {
       expect(item).to.be.an.instanceof(externalModel);
       expect(item).to.have.property('prop', 'hello');
       expect(item).not.to.have.property('secret');
+    });
+    it('proxies find to another model returning an instance of the proxy using callback', done => {
+      externalModel.find((err: any, result: any) => {
+        expect(result).to.be.an('array');
+        let item = result[0];
+        expect(item).to.be.an.instanceof(externalModel);
+        expect(item).to.have.property('prop', 'hello');
+        expect(item).not.to.have.property('secret');
+        done(err);
+      });
     });
     it('proxies writes to the underlying model', async () => {
       let result = await externalModel.findById(instance.id);
@@ -127,6 +148,59 @@ describe('@RemoteMethodModule Decorator', () => {
       let inst = await externalModel.create({ prop: 'greetings' });
       let updated = await internalModel.findById(inst.id);
       expect(updated).to.have.property('prop', 'greetings');
+    });
+  });
+
+  context('Error Handling', () => {
+    let internalModel: any, externalModel: any, decorated: any, instance: any;
+    before('Configure proxy', () => {
+      const app = loopback();
+      internalModel = loopback.Model.extend(
+        `Internal${Date.now()}`,
+        { secret: 'string', prop: 'string' },
+        {}
+      );
+      internalModel.throwAnErrorMethod = function(cb?: Function) {
+        if (cb) {
+          return cb(new Error('Error from the internal model'));
+        } else {
+          return Promise.reject(new Error('Error from the internal model'));
+        }
+      };
+      externalModel = loopback.Model.extend(
+        `External${Date.now()}`,
+        { prop: 'string' },
+        { strict: true, idInjection: false, forceId: false }
+      );
+      let memory = loopback.memory();
+      internalModel.attachTo(memory);
+      externalModel.attachTo(memory);
+      app.model(internalModel);
+      app.model(externalModel);
+
+      @RemoteMethodModule({
+        proxyFor: internalModel.modelName,
+        strict: true,
+        proxyMethods: ['throwAnErrorMethod'],
+      })
+      class ModelClass {
+        constructor(public model: any) {}
+      }
+
+      decorated = new ModelClass(externalModel);
+      app.emit('booted');
+    });
+
+    it('proxies error', async () => {
+      await expect(
+        externalModel.throwAnErrorMethod()
+      ).to.eventually.be.rejectedWith(Error, 'Error from the internal model');
+    });
+    it('proxies error using callback', done => {
+      externalModel.throwAnErrorMethod((err: any, result: any) => {
+        expect(err.message).to.equal('Error from the internal model');
+        done(result);
+      });
     });
   });
 });
