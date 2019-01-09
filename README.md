@@ -193,6 +193,31 @@ You can also pass the config directly:
   @Response({ responseClass: 'MyResponseClass', isMulti: true })
 ```
 
+# Proxy requests from one model to another
+
+In some cases - you want to have your public API use strict ACLs but keep your internal models private yet still open to Admin type applications.
+In these cases, `proxyFor` allows you to proxy certain remote methods onto another model:
+
+```ts
+import { RemoteMethodModule } from 'loopback-decorators';
+
+@RemoteMethodModule({
+  proxyFor: 'ModelInternal',
+  proxyMethods: ['find', 'findById'],
+})
+export class ModelAPI {
+  constructor(public Model: any) {}
+}
+
+export = function(Model: any) {
+  return new ModelAPI(Model);
+};
+```
+
+The above example will allow your `ModelAPI` model to use `find` and `findById` as API endpoints which will talk to `ModelInternal` under the hood.
+
+_IMPORTANT NOTE_ The api model (`ModelAPI` in this case) _MUST_ extend `PersistedModel` for the above to work as `find` and `findById` are methods of `PersistedModel` and not `Model`.
+
 # License
 
 MIT
